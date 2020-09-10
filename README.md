@@ -7,6 +7,7 @@ Delivered in a foxx application containing a visual UI based on reactjs.
 
 Prerequisites:
 ```
+cd react
 yarn install
 ```
 
