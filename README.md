@@ -23,17 +23,17 @@ yarn start // Needs an ArangoDB instance to be available at http://localhost:852
 
 ## Use the Makefile:
 
-Create bundles zipfile:
-```
-make zip
-```
-
-Create local build:
+1. Prepares local build directory structure:
 ```
 make deploy
 ```
 
-Install to ArangoDB:
+2. Create bundles zipfile:
+```
+make zip
+```
+
+3. Install to ArangoDB:
 ```
 make install // needs environment variables FOXX_CLI and FOXX_SERVER to be set
 ```
