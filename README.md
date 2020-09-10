@@ -1,12 +1,20 @@
-# pregelator
+# pregelator (experimental feature)
 
-Pregel UI IDE to write and execute customizable pregel algorithms.
-Delivered in a foxx application containing a visual UI based on reactjs.
+_Note: This Foxx Service is still in development._
+
+Pregel UI IDE to write and execute Programmable Pregel Algorithms,
+delivered in a foxx service containing a visual UI to improve the 
+development of custom algorithms.
+
+This is an experimental feature of ArangoDB 3.8.
+
+
 
 ## Use the build in JS commands:
 
 Prerequisites:
 ```
+cd react
 yarn install
 ```
 
@@ -17,22 +25,25 @@ yarn build
 
 To develop:
 ```
-yarn start // Needs an ArangoDB instance to be available at http://localhost:8529
+// Needs an ArangoDB instance to be available at http://localhost:8529
+// Instance need to be started with flag: --all.http.trusted-origin all 
+
+yarn start
 ```
 
 ## Use the Makefile:
 
-Create bundles zipfile:
-```
-make zip
-```
-
-Create local build:
+1. Prepares local build directory structure:
 ```
 make deploy
 ```
 
-Install to ArangoDB:
+2. Create bundles zipfile:
+```
+make zip
+```
+
+3. Install to ArangoDB:
 ```
 make install // needs environment variables FOXX_CLI and FOXX_SERVER to be set
 ```
