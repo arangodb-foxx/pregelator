@@ -1,6 +1,6 @@
 {
   "name": "Pregelator",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Application to easily write and execute customized Pregel algorithms",
   "engines": {
     "arangodb": "^3.0.0"
@@ -15,8 +15,8 @@
   },
   "configuration": {},
   "files": {
-    "/index.html": "build/index.html",
-    "/static": "build/static"
+    "/index.html": "react/build/index.html",
+    "/static": "react/build/static"
   },
   "tests": "test/**/*.js"
 }
