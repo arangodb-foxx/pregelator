@@ -3,8 +3,44 @@
 Pregel UI IDE to write and execute customizable pregel algorithms.
 Delivered in a foxx application containing a visual UI based on reactjs.
 
-TODOs: 
-- [x] Add env variables for production builds and development setup (Requests URLs)
+## Use the build in JS commands:
+
+Prerequisites:
+```
+yarn install
+```
+
+To build:
+```
+yarn build
+```
+
+To develop:
+```
+yarn start // Needs an ArangoDB instance to be available at http://localhost:8529
+```
+
+## Use the Makefile:
+
+Create bundles zipfile:
+```
+make zip
+```
+
+Create local build:
+```
+make deploy
+```
+
+Install to ArangoDB:
+```
+make install // needs environment variables FOXX_CLI and FOXX_SERVER to be set
+```
+
+Clean local build:
+```
+make clean
+```
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
