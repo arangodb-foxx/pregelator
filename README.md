@@ -8,7 +8,17 @@ development of custom algorithms.
 
 This is an experimental feature of ArangoDB 3.8.
 
+## Creating a new build
 
+Steps needed to create a new build:
+```
+- Run `yarn build`
+- Edit `manifest.json` and increase version number
+- Run `make deploy`
+- Run `make zip`
+- Change the name of the zip-file accordingly.
+- Commit and push chnages.
+```
 
 ## Use the build in JS commands:
 
@@ -31,7 +41,7 @@ To develop:
 yarn start
 ```
 
-## Use the Makefile:
+## Using the Makefile:
 
 1. Prepares local build directory structure:
 ```
