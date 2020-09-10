@@ -18,7 +18,10 @@ yarn build
 
 To develop:
 ```
-yarn start // Needs an ArangoDB instance to be available at http://localhost:8529
+// Needs an ArangoDB instance to be available at http://localhost:8529
+// Instance need to be started with flag: --all.http.trusted-origin all 
+
+yarn start
 ```
 
 ## Use the Makefile:
