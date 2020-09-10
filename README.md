@@ -17,7 +17,7 @@ Steps needed to create a new build:
 - Run `make deploy`
 - Run `make zip`
 - Change the name of the zip-file accordingly.
-- Commit and push chnages.
+- Commit and push changes.
 ```
 
 ## Use the build in JS commands:
