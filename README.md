@@ -1,7 +1,14 @@
-# pregelator
+# pregelator (experimental feature)
 
-Pregel UI IDE to write and execute customizable pregel algorithms.
-Delivered in a foxx application containing a visual UI based on reactjs.
+_Note: This Foxx Service is still in development._
+
+Pregel UI IDE to write and execute Programmable Pregel Algorithms,
+delivered in a foxx service containing a visual UI to improve the 
+development of custom algorithms.
+
+This is an experimental feature of ArangoDB 3.8.
+
+
 
 ## Use the build in JS commands:
 
