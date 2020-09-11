@@ -37,6 +37,7 @@ To develop:
 ```
 // Needs an ArangoDB instance to be available at http://localhost:8529
 // Instance need to be started with flag: --all.http.trusted-origin all 
+// Needs also the foxx-service part to be deployed under foxx route: "/pregeli"
 
 yarn start
 ```
