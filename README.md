@@ -1,6 +1,6 @@
 # pregelator (experimental feature)
 
-_Note: This Foxx Service is still in development._
+_Note: This Foxx Service is still in development. Currently only tested in Google's Chrome Browser._
 
 Pregel UI IDE to write and execute Programmable Pregel Algorithms,
 delivered in a foxx service containing a visual UI to improve the 
