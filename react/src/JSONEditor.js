@@ -347,7 +347,7 @@ const JSONEditor = () => {
             </Box>
             <Box basis={'1/2'} background='dark-1'>
               <Box background={'brand'}>
-                <Text margin={'xsmall'} weight={'bold'}>Preview</Text>
+                <Text margin={'xsmall'} weight={'bold'}>Preview <Text weight={'normal'}>(result only filtered if "resultField" is used)</Text></Text>
               </Box>
               <AceEditor ref={previewEditorRef}
                          value={""}
