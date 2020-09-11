@@ -1,55 +1,38 @@
 const resultField = "resultField";
 const dampingFactor = 0.85;
 
-const exampleAlgo = {
-  resultField: resultField,
-  maxGSS: 5,
-  globalAccumulators: {},
-  vertexAccumulators: {
-    rank: {
-      accumulatorType: "sum",
-      valueType: "doubles"
-    },
-    tmpRank: {
-      accumulatorType: "sum",
-      valueType: "doubles"
-    },
+const vertexDegrees = {
+  "dataAccess": {
+    "writeVertex": [
+      "attrib-set", ["attrib-set", ["dict"], "inDegree", ["accum-ref", "inDegree"]],
+      "outDegree", ["accum-ref", "outDegree"]
+    ]
   },
-  phases: [
-    {
-      name: "main",
-      initProgram: [
-        "seq",
-        ["accum-set!", "rank", ["/", 1, ["vertex-count"]]],
-        ["accum-set!", "tmpRank", 0],
-        [
-          "send-to-all-neighbors",
-          "tmpRank",
-          ["/", ["accum-ref", "rank"], ["this-number-outbound-edges"]],
-        ],
-        true,
-      ],
-      updateProgram: [
-        "seq",
-        [
-          "accum-set!",
-          "rank",
-          [
-            "+",
-            ["/", ["-", 1, dampingFactor], ["vertex-count"]],
-            ["*", dampingFactor, ["accum-ref", "tmpRank"]],
-          ],
-        ],
-        ["accum-set!", "tmpRank", 0],
-        [
-          "send-to-all-neighbors",
-          "tmpRank",
-          ["/", ["accum-ref", "rank"], ["this-number-outbound-edges"]],
-        ],
-        true,
-      ],
+  "maxGSS": 2,
+  "vertexAccumulators": {
+    "outDegree": {
+      "accumulatorType": "store",
+      "valueType": "ints"
     },
-  ],
+    "inDegree": {
+      "accumulatorType": "sum",
+      "valueType": "ints"
+    }
+  },
+  "phases": [{
+    "name": "main",
+    "initProgram": ["seq",
+      // Set our out degree
+      ["accum-set!", "outDegree", ["this-outbound-edges-count"]],
+      // Init in degree to 0
+      ["accum-set!", "inDegree", 0],
+      ["send-to-all-neighbours", "inDegree", 1]
+    ],
+    // Update program has to run once to accumulate the
+    // inDegrees that have been sent out in initProgram
+    "updateProgram": ["seq",
+      false]
+  }]
 };
 
-module.exports.exampleAlgo = exampleAlgo;
+module.exports.vertexDegrees = vertexDegrees;

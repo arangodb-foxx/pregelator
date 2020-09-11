@@ -12,7 +12,7 @@ const router = createRouter();
 module.context.use(router);
 
 // example algo
-const exampleAlgo = require('./algos/exampleAlgorithm').exampleAlgo;
+const vertexDegrees = require('./algos/exampleAlgorithm').vertexDegrees;
 
 router.post('/start', function (req, res) {
   const name = req.body.name || "name";
@@ -104,8 +104,8 @@ router.get('/userDefinedAlgorithms', function (req, res) {
   });
 
   // also push demo example
-  result["dev_DemoPageRank"] = {
-    algorithm: exampleAlgo
+  result["dev_DemoVertexDegrees"] = {
+    algorithm: vertexDegrees
   };
 
   res.send(result);
