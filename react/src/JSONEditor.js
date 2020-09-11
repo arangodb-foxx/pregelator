@@ -124,9 +124,6 @@ const JSONEditor = () => {
       let resultField;
       if ('resultField' in algorithm) {
         resultField = algorithm.resultField;
-      } else {
-        toast.error("Attribute resultField is missing!");
-        return;
       }
 
       if (!selectedGraph) {
@@ -195,7 +192,7 @@ const JSONEditor = () => {
 
 // local state
   const [selectedGraph, setSelectedGraph] = useState(null);
-  const [selectedLocalAlgorithm, setLocalSelectedAlgorithm] = useState(null);
+  const [, setLocalSelectedAlgorithm] = useState(null);
 
   const setSelectedAlgorithm = (algo) => {
     setLocalSelectedAlgorithm(algo);
@@ -370,8 +367,7 @@ const JSONEditor = () => {
             <Text margin={'xsmall'} weight={'bold'}>Reports</Text>
           </Box>
           <Box basis='2/3' overflow={"scroll"} background='dark-1'>
-            // TODO: Make DataTable height responsive
-            <DataTable resizeable={false} size={"large"} alignSelf={"stretch"} primaryKey={false} /*size={"full"}*/
+            <DataTable resizeable={false} size={"large"} alignSelf={"stretch"} primaryKey={false} /*size={"full"}*/ /* TODO: Make DataTable height responsive*/
                        columns={[
                          {
                            property: 'msg',
