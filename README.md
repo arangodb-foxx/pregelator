@@ -10,7 +10,7 @@ This is an experimental feature of ArangoDB 3.8.
 
 ## Storing custom algorithms in a collection
 
-Pregelator will create a collection named: "<mount-path-prefix>_userDefinedAlgorithms"
+Pregelator will create a collection named: `"<foxx-mount-path-prefix>_userDefinedAlgorithms"`
 
 Documents stored in that collection will be visible in the Pregelator UI.
 The format must be:
