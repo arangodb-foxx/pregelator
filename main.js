@@ -18,11 +18,18 @@ router.post('/start', function (req, res) {
   const name = req.body.name || "name";
   const graphName = req.body.graphName;
   const algorithm = req.body.algorithm;
-  let pid = pregel.start(
-    "air",
-    graphName,
-    algorithm
-  );
+  let pid = "";
+
+  try {
+    pid = pregel.start(
+      "air",
+      graphName,
+      algorithm
+    );
+  } catch (e) {
+    res.throw('bad request', e.message, {cause: e});
+  }
+
   res.send({
     pid: pid
   });
