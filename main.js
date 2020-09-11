@@ -54,13 +54,24 @@ router.post('/resultDetails', function (req, res) {
     let collectionName = col.name();
     finalResult[collectionName] = [];
 
-    let res = db._query(
-      'FOR doc IN @@vertexCollection LIMIT 5 RETURN doc[@resultField]',
-      {
-        '@vertexCollection': collectionName,
-        'resultField': resultField
-      }
-    ).toArray();
+    let res;
+    if (resultField !== "") {
+      res = db._query(
+        'FOR doc IN @@vertexCollection LIMIT 5 RETURN doc[@resultField]',
+        {
+          '@vertexCollection': collectionName,
+          'resultField': resultField
+        }
+      ).toArray();
+    } else {
+      res = db._query(
+        'FOR doc IN @@vertexCollection LIMIT 5 RETURN doc',
+        {
+          '@vertexCollection': collectionName
+        }
+      ).toArray();
+    }
+
     finalResult[collectionName].push(res);
   }
   ;
