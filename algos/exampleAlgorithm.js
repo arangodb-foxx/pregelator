@@ -3,19 +3,16 @@ const dampingFactor = 0.85;
 
 const exampleAlgo = {
   resultField: resultField,
-  // TODO: Karpott.
   maxGSS: 5,
   globalAccumulators: {},
   vertexAccumulators: {
     rank: {
       accumulatorType: "sum",
-      valueType: "doubles",
-      storeSender: false,
+      valueType: "doubles"
     },
     tmpRank: {
       accumulatorType: "sum",
-      valueType: "doubles",
-      storeSender: false,
+      valueType: "doubles"
     },
   },
   phases: [
