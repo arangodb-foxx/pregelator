@@ -213,7 +213,8 @@ const JSONEditor = () => {
         headers:
           {'Content-Type': 'application/json'}
       }).then((responseStatus) => {
-      if (responseStatus.data && (responseStatus.data.state === 'done' || responseStatus.data.state === 'canceled')) {
+      // only refetch state in case of status is not "running"
+      if (responseStatus.data && (responseStatus.data.state !== 'running')) {
         post(
           process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'resultDetails',
           {
