@@ -71,7 +71,7 @@ function App() {
                         onClick={() => setShowSidebar(!showSidebar)}
                       />
                     </AppBar>
-                    <ToastContainer position="bottom-left"/>
+                    <ToastContainer position="bottom-left" autoClose={10000} style={{width: (window.outerWidth / 2)}}/>
                     <Box direction='row' flex overflow={{horizontal: 'hidden'}}>
                       <Box flex>
                         <JSONEditor>
