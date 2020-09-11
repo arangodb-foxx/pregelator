@@ -158,9 +158,32 @@ const JSONEditor = () => {
         return {...updated};
       });
       notifyUser("Pregel started, PID: " + response.data.pid);
-    } catch (e) {
-      console.log(e);
-      toast.error("Parse error!");
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+        if (error.response.data) {
+          let e = error.response.data;
+          if (e.errorNum && e.errorMessage) {
+            toast.error(`Error (${e.errorNum}): ${e.errorMessage}`);
+          } else {
+            toast.error(`Something unexpected happened. Please check logfiles.`);
+          }
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
     }
   }
 
@@ -309,7 +332,9 @@ const JSONEditor = () => {
         <Box flex direction='column'>
           <Box flex direction='row' width={'full'} height="small">
             <Box basis={'1/2'} background='dark-1'>
-              <Box background={'brand'}><Text margin={'xsmall'} weight={'bold'}>Summary</Text></Box>
+              <Box background={'brand'}>
+                <Text margin={'xsmall'} weight={'bold'}>Summary</Text>
+              </Box>
               <AceEditor ref={outputEditorRef}
                          readOnly={true}
                          value={""}
@@ -324,7 +349,9 @@ const JSONEditor = () => {
               />
             </Box>
             <Box basis={'1/2'} background='dark-1'>
-              <Box background={'brand'}><Text margin={'xsmall'} weight={'bold'}>Preview</Text></Box>
+              <Box background={'brand'}>
+                <Text margin={'xsmall'} weight={'bold'}>Preview</Text>
+              </Box>
               <AceEditor ref={previewEditorRef}
                          value={""}
                          readOnly={true}
@@ -339,7 +366,9 @@ const JSONEditor = () => {
               />
             </Box>
           </Box>
-          <Box background={'brand'}><Text margin={'xsmall'} weight={'bold'}>Reports</Text></Box>
+          <Box background={'brand'}>
+            <Text margin={'xsmall'} weight={'bold'}>Reports</Text>
+          </Box>
           <Box basis='2/3' overflow={"scroll"} background='dark-1'>
             <DataTable resizeable={false} size={"full"} alignSelf={"stretch"} primaryKey={false}
                        columns={[
