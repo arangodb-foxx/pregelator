@@ -370,7 +370,8 @@ const JSONEditor = () => {
             <Text margin={'xsmall'} weight={'bold'}>Reports</Text>
           </Box>
           <Box basis='2/3' overflow={"scroll"} background='dark-1'>
-            <DataTable resizeable={false} size={"full"} alignSelf={"stretch"} primaryKey={false}
+            // TODO: Make DataTable height responsive
+            <DataTable resizeable={false} size={"large"} alignSelf={"stretch"} primaryKey={false} /*size={"full"}*/
                        columns={[
                          {
                            property: 'msg',
