@@ -71,7 +71,7 @@ const JSONEditor = () => {
                 headers:
                   {'Content-Type': 'application/json'}
               }).then((response) => {
-              if (response.data && response.data.state === 'done') {
+              if (response.data && response.data.state !== 'running') {
                 setPregels(prevPregels => {
                   let updated = prevPregels;
                   updated[pregel.pid].state = response.data.state;
