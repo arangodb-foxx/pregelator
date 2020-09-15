@@ -13,23 +13,15 @@ import {toast} from "react-toastify";
 import {Button} from "grommet/index";
 
 const getRunning = (pregels) => {
-  let filteredArr = [];
-  for (let [, pregel] of Object.entries(pregels)) {
-    if (pregel.state === 'running') {
-      filteredArr.push(pregel);
-    }
-  }
-  return filteredArr;
+  return Object.values(pregels).filter(p => p.state === 'running' || p.state === 'storing');
 };
 
 const getDone = (pregels) => {
-  let filteredArr = [];
-  for (let [, pregel] of Object.entries(pregels)) {
-    if (pregel.state === 'done') {
-      filteredArr.push(pregel);
-    }
-  }
-  return filteredArr;
+  return Object.values(pregels).filter(p => p.state === 'done');
+};
+
+const getOther = (pregels) => {
+  return Object.values(pregels).filter(p => p.state !== 'done' && p.state !== 'running' && p.state !== 'storing');
 };
 
 const RunningPregelList = () => {
@@ -91,6 +83,11 @@ const RunningPregelList = () => {
     setPregels({});
   }
 
+  const donePs = getDone(pregels);
+  const otherPs = getOther(pregels);
+  const runningPs = getRunning(pregels);
+
+
   return (
     <div>
       <Box width={'full'}>
@@ -102,13 +99,13 @@ const RunningPregelList = () => {
         />
       </Box>
 
-      <Heading level="3">Running ({Object.keys(getRunning(pregels)).length})</Heading>
+      <Heading level="3">Running ({runningPs.length})</Heading>
 
       <Box>
-        {Object.keys(getRunning(pregels)).length === 0 &&
+        {runningPs.length === 0 &&
         <Text>No pregel algorithm started yet.</Text>
         }
-        {Object.keys(getRunning(pregels)).length > 0 &&
+        {runningPs.length > 0 &&
         <DataTable
           columns={[
             {
@@ -127,18 +124,18 @@ const RunningPregelList = () => {
               )
             },
           ]}
-          data={getRunning(pregels)}
+          data={runningPs}
         />
         }
 
       </Box>
 
-      <Heading level="3">Done ({Object.keys(getDone(pregels)).length})</Heading>
+      <Heading level="3">Done ({donePs.length})</Heading>
       <Box>
-        {Object.keys(getDone(pregels)).length === 0 &&
+        {donePs.length === 0 &&
         <Text>No pregel algorithm finished yet.</Text>
         }
-        {Object.keys(getDone(pregels)).length > 0 &&
+        {donePs.length > 0 &&
 
         <DataTable
           columns={[
@@ -160,7 +157,40 @@ const RunningPregelList = () => {
           onClickRow={(datum) => {
             fetchExecutionResult(datum.datum);
           }}
-          data={getDone(pregels)}
+          data={donePs}
+        />
+
+        }
+      </Box>
+
+      <Heading level="3">Errored ({otherPs.length})</Heading>
+      <Box>
+        {otherPs.length === 0 &&
+        <Text>No pregel algorithm errored yet.</Text>
+        }
+        {otherPs.length > 0 &&
+
+        <DataTable
+          columns={[
+            {
+              property: 'pid',
+              header: <Text>ID</Text>
+            },
+            {
+              property: 'percent',
+              header: 'Execution time',
+              render: datum => (
+                <Box>
+                  <Text>{datum.totalRuntime}</Text>
+                </Box>
+
+              )
+            },
+          ]}
+          onClickRow={(datum) => {
+            fetchExecutionResult(datum.datum);
+          }}
+          data={otherPs}
         />
 
         }

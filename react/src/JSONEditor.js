@@ -6,13 +6,13 @@ import "ace-builds/src-noconflict/ext-language_tools"
 import "ace-builds/src-noconflict/mode-json";
 import "./css/customList.css"
 
-import {Box, Button, DataTable, Select, Text, Paragraph, List} from "grommet/index";
+import {Box, Button, DataTable, Select, Text, Paragraph, List, TextInput} from "grommet/index";
 import {post} from "axios";
 import {toast} from "react-toastify";
 
 import {usePregel} from "./PregelContext";
 import {SmartGraphListContext} from "./SmartGraphListContext";
-import {UserDefinedAlgorithmsContext} from "./UserDefinedAlgorithmsContext";
+import {useUserDefinedAlgorithms, storeAlgorithm, selectAlgorithm} from "./UserDefinedAlgorithmsContext";
 import {useExecution} from "./ExecutionContext";
 
 const EditorActionsBar = (props) => (
@@ -56,12 +56,30 @@ function useInterval(callback, delay) {
   }, [delay]);
 }
 
+const SaveAs = ({editorRef}) => {
+  const [saveAsName, setSaveAsName] = useState("");
+  const [, dispatchUDF] = useUserDefinedAlgorithms();
+  const saveAlgorithm = () => {
+    dispatchUDF(storeAlgorithm(saveAsName, editorRef.current.editor.getValue()));
+  };
+
+  return (<>
+        <Button
+          primary
+          label="Save_as"
+          margin={{left: 'small'}}
+          onClick={saveAlgorithm}
+        />
+        <TextInput margin={{left: 'small'}} size="small" placeholder="AlgorithmName" onChange={e => setSaveAsName(e.target.value)} value={saveAsName}></TextInput>
+        </>);
+};
+
 const JSONEditor = () => {
   useInterval(() => {
       // Update logic
       let checkState = (pregels) => {
         for (let [, pregel] of Object.entries(pregels)) {
-          if (pregel.state === 'running') {
+          if (pregel.state === 'running' || pregel.state === 'storing') {
             post(
               process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'status',
               {
@@ -71,7 +89,7 @@ const JSONEditor = () => {
                 headers:
                   {'Content-Type': 'application/json'}
               }).then((response) => {
-              if (response.data && response.data.state !== 'running') {
+              if (response.data && response.data.state !== 'running' && response.data.state !== 'storing') {
                 setPregels(prevPregels => {
                   let updated = prevPregels;
                   updated[pregel.pid].state = response.data.state;
@@ -175,11 +193,9 @@ const JSONEditor = () => {
         // The request was made but no response was received
         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
         // http.ClientRequest in node.js
-        console.log(error.request);
         toast.error(`Error: ${error.request}`);
       } else {
         // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
         toast.error(`Error: ${error.message}`);
       }
       console.log(error.config);
@@ -188,25 +204,27 @@ const JSONEditor = () => {
 
 // global states
   const [graphs] = useContext(SmartGraphListContext);
-  const [userDefinedAlgorithms] = useContext(UserDefinedAlgorithmsContext);
+  const [{ selectedAlgorithm, userDefinedAlgorithms }, dispatchUDF] = useUserDefinedAlgorithms();
   const [pregels, setPregels] = usePregel();
   const [execution, setExecution] = useExecution();
 
+  const algorithm = userDefinedAlgorithms.hasOwnProperty(selectedAlgorithm)
+    ? JSON.stringify(userDefinedAlgorithms[selectedAlgorithm].algorithm, null, 2)
+    : "";
+  
 // local state
   const [selectedGraph, setSelectedGraph] = useState(null);
-  const [, setLocalSelectedAlgorithm] = useState(null);
+
 
   const setSelectedAlgorithm = (algo) => {
-    setLocalSelectedAlgorithm(algo);
-
-    let algorithm = "";
-    try {
-      algorithm = userDefinedAlgorithms[algo].algorithm;
-      editorRef.current.editor.setValue(JSON.stringify(algorithm, null, 2), -1);
-    } catch (e) {
-      toast(`Something went wrong: ${e}`);
-    }
+    dispatchUDF(selectAlgorithm(algo));
   }
+
+
+
+  const replaceAlgorithm = () => {
+    dispatchUDF(storeAlgorithm(selectedAlgorithm, editorRef.current.editor.getValue()));
+  };
 
   /*const getSelectedAlgorithm = () => {
     if (selectedLocalAlgorithm) {
@@ -287,6 +305,7 @@ const JSONEditor = () => {
           onChange={({option}) => {
             setSelectedAlgorithm(option);
           }}
+          value={selectedAlgorithm}
         />
 
         <Select
@@ -304,6 +323,15 @@ const JSONEditor = () => {
           margin={{left: 'small'}}
           onClick={executeAlgorithm}
         />
+
+        <Button
+          primary
+          label="Save"
+          margin={{left: 'small'}}
+          onClick={replaceAlgorithm}
+        />
+
+        <SaveAs editorRef={editorRef}></SaveAs>
 
       </EditorActionsBar>
 
@@ -325,6 +353,8 @@ const JSONEditor = () => {
                      name="aceInputEditor"
                      setOptions={{useWorker: false}}
                      editorProps={{$blockScrolling: true}}
+                     value={algorithm}
+                     placeholder="Please select an algorithm"
           />
         </Box>
 
@@ -377,7 +407,7 @@ const JSONEditor = () => {
                            size: 'medium',
                            render: datum => (
                              <Paragraph size={'small'}>
-                               {datum.msg}
+                               {datum.msg === "debug trace" ? datum.annotations.message || datum.msg : datum.msg}
                              </Paragraph>
                            )
                          },
@@ -407,7 +437,8 @@ const JSONEditor = () => {
                                        name: 'Step / Superstep',
                                        content: (datum.annotations["phase-step"]) + " / " + (datum.annotations["global-superstep"])
                                      },
-                                     {name: 'Phase', content: datum.annotations["phase"]}
+                                     {name: 'Phase', content: datum.annotations["phase"]},
+                                     {name: 'Sender', content: datum.annotations.sender || ""}
                                    ]}
                              />
                            )

@@ -121,6 +121,21 @@ router.get('/userDefinedAlgorithms', function (req, res) {
 
   res.send(result);
 })
-  .response(['application/json'], 'A generic greeting.')
-  .summary('Generic greeting')
-  .description('Prints a generic greeting.');
+  .response(['application/json'], 'Map of algorithms. name => implementation')
+  .summary('Get all stored algorithms')
+  .description('Get all stored pregel algorithms. As a Map name => implementation.');
+
+
+  router.put('/userDefinedAlgorithms/:name', function (req, res) {
+    const qualifiedName = module.context.collectionName("userDefinedAlgorithms");
+    const query = `INSERT {_key: @name, algorithm: @algorithm} INTO ${qualifiedName} OPTIONS { overwrite: true }`;
+    const name = req.param("name");
+    const algorithm = req.body;
+    db._query(query, {name, algorithm});
+    res.send(true);
+  })
+    .pathParam('name', joi.string().required())
+    .body(joi.object().required(), "Alogrithm data")
+    .response(['application/json'], 'Success Message')
+    .summary('Save the given algorithm.')
+    .description('Save the given algorithm');
