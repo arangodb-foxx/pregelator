@@ -27,7 +27,7 @@ export const storeAlgorithm = (name, data) => ({
 export const selectAlgorithm = (name) => ({
   type: "select",
   payload: name
-})
+});
 
 const reducer = (state, action) => {
   switch (action.type) {
