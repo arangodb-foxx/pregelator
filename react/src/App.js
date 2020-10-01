@@ -194,7 +194,7 @@ function App() {
               <TextInput id="text-username-input-id" name="username"/>
             </FormField>
             <FormField name="password" htmlfor="text-password-input-id" label="Password">
-              <TextInput id="text-password-input-id" name="password"/>
+              <TextInput type="password" id="text-password-input-id" name="password"/>
             </FormField>
             <Box direction="row" gap="medium">
               <Button type="submit" primary label="Login" margin={{left: 'small'}}/>
