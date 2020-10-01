@@ -8,7 +8,7 @@ import {
 
 import {PregelContext} from './PregelContext';
 import {useExecution} from "./ExecutionContext";
-import {post} from "axios";
+import {get, post} from "axios";
 import {toast} from "react-toastify";
 import {Button} from "grommet/index";
 import jwtControl from "./JWTControl";
@@ -32,11 +32,9 @@ const RunningPregelList = () => {
   const fetchExecutionResult = (execution) => {
     toast(`Fetching status now of pid: ${execution.pid}`);
 
-    post(
-      process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'status',
-      {
-        pid: execution.pid
-      },
+    get(
+      process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL + '/' + execution.pid,
+      //process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'status',
       jwtControl.getAuthConfig()).then((responseStatus) => {
       if (responseStatus.data && responseStatus.data.state === 'done') {
         post(
