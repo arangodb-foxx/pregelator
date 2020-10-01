@@ -7,7 +7,7 @@ import "ace-builds/src-noconflict/mode-json";
 import "./css/customList.css"
 
 import {Box, Button, DataTable, Select, Text, Paragraph, List, TextInput} from "grommet/index";
-import {post} from "axios";
+import {get, post} from "axios";
 import {toast} from "react-toastify";
 
 import {usePregel} from "./PregelContext";
@@ -64,14 +64,15 @@ const SaveAs = ({editorRef}) => {
   };
 
   return (<>
-        <Button
-          primary
-          label="Save_as"
-          margin={{left: 'small'}}
-          onClick={saveAlgorithm}
-        />
-        <TextInput margin={{left: 'small'}} size="small" placeholder="AlgorithmName" onChange={e => setSaveAsName(e.target.value)} value={saveAsName}></TextInput>
-        </>);
+    <Button
+      primary
+      label="Save&nbsp;as"
+      margin={{left: 'small', right: 'small'}}
+      onClick={saveAlgorithm}
+    />
+    <TextInput margin={{left: 'small'}} size="small" placeholder="AlgorithmName"
+               onChange={e => setSaveAsName(e.target.value)} value={saveAsName}/>
+  </>);
 };
 
 const JSONEditor = () => {
@@ -80,11 +81,8 @@ const JSONEditor = () => {
       let checkState = (pregels) => {
         for (let [, pregel] of Object.entries(pregels)) {
           if (pregel.state === 'running' || pregel.state === 'storing') {
-            post(
-              process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'status',
-              {
-                pid: pregel.pid
-              },
+            get(
+              process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL + '/' + pregel.pid,
               {
                 headers:
                   {'Content-Type': 'application/json'}
@@ -149,22 +147,26 @@ const JSONEditor = () => {
         return;
       }
 
+      console.log(process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL);
       const response = await post(
-        process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'start',
+        process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL,
+        //process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'start',
         {
-          name: "AIR",
+          algorithm: "air",
           graphName: selectedGraph,
-          algorithm: algorithm
+          params: algorithm
         },
         {
           headers:
             {'Content-Type': 'application/json'}
         });
 
+      const pregelPid = response.data;
+
       setPregels(prevPregels => {
         let updated = prevPregels;
-        updated[response.data.pid] = {
-          "pid": response.data.pid,
+        updated[pregelPid] = {
+          "pid": pregelPid,
           "totalRuntime": null,
           "resultField": resultField,
           "selectedGraph": selectedGraph,
@@ -172,7 +174,7 @@ const JSONEditor = () => {
         }
         return {...updated};
       });
-      notifyUser("Pregel started, PID: " + response.data.pid);
+      notifyUser("Pregel started, PID: " + pregelPid);
     } catch (error) {
       console.log(error);
       if (error.response) {
@@ -204,14 +206,14 @@ const JSONEditor = () => {
 
 // global states
   const [graphs] = useContext(SmartGraphListContext);
-  const [{ selectedAlgorithm, userDefinedAlgorithms }, dispatchUDF] = useUserDefinedAlgorithms();
+  const [{selectedAlgorithm, userDefinedAlgorithms}, dispatchUDF] = useUserDefinedAlgorithms();
   const [pregels, setPregels] = usePregel();
   const [execution, setExecution] = useExecution();
 
   const algorithm = userDefinedAlgorithms.hasOwnProperty(selectedAlgorithm)
     ? JSON.stringify(userDefinedAlgorithms[selectedAlgorithm].algorithm, null, 2)
     : "";
-  
+
 // local state
   const [selectedGraph, setSelectedGraph] = useState(null);
 
@@ -219,7 +221,6 @@ const JSONEditor = () => {
   const setSelectedAlgorithm = (algo) => {
     dispatchUDF(selectAlgorithm(algo));
   }
-
 
 
   const replaceAlgorithm = () => {
@@ -244,11 +245,8 @@ const JSONEditor = () => {
   const fetchExecutionResult = (execution) => {
     toast(`Fetching status now of pid: ${execution.pid}`);
 
-    post(
-      process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'status',
-      {
-        pid: execution.pid
-      },
+    get(
+      process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL + '/' + execution.pid,
       {
         headers:
           {'Content-Type': 'application/json'}
@@ -379,7 +377,8 @@ const JSONEditor = () => {
             </Box>
             <Box basis={'1/2'} background='dark-1'>
               <Box background={'brand'}>
-                <Text margin={'xsmall'} weight={'bold'}>Preview <Text weight={'normal'}>(result only filtered if "resultField" is used)</Text></Text>
+                <Text margin={'xsmall'} weight={'bold'}>Preview <Text weight={'normal'}>(result only filtered if
+                  "resultField" is used)</Text></Text>
               </Box>
               <AceEditor ref={previewEditorRef}
                          value={""}
@@ -399,7 +398,8 @@ const JSONEditor = () => {
             <Text margin={'xsmall'} weight={'bold'}>Reports</Text>
           </Box>
           <Box basis='2/3' overflow={"scroll"} background='dark-1'>
-            <DataTable resizeable={false} size={"large"} alignSelf={"stretch"} primaryKey={false} /*size={"full"}*/ /* TODO: Make DataTable height responsive*/
+            <DataTable resizeable={false} size={"large"} alignSelf={"stretch"}
+                       primaryKey={false} /*size={"full"}*/ /* TODO: Make DataTable height responsive*/
                        columns={[
                          {
                            property: 'msg',

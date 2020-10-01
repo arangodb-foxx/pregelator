@@ -8,7 +8,9 @@ zip: react/build/index.html
 
 deploy: react/build/index.html
 	mkdir -p deploy
-	cp -av algos react/build main.js manifest.json scripts deploy
+	mkdir -p deploy/react
+	cp -r react/build deploy/react
+	cp -av algos main.js manifest.json scripts deploy
 
 install: deploy
 	$(FOXX_CLI) --server $(FOXX_SERVER) remove "/pregelator" 
