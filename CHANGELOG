@@ -1,0 +1,6 @@
+Build_v0_0_8
+-----
+
+* Added login mask authentication page.
+* Use native Pregel API (Start/Stop). Needed to work with load balancer used in Oasis.
+* UI optimizations.
