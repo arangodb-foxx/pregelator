@@ -1,6 +1,7 @@
 import React, {useContext, createContext, useEffect, useReducer} from 'react';
 import {get, put} from "axios";
 import {toast} from "react-toastify";
+import jwtControl from "./JWTControl";
 
 const initialState = {
   userDefinedAlgorithms: {},
@@ -33,9 +34,11 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "fetch": {
       const disp = action.payload;
-      get(process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'userDefinedAlgorithms')
-      .then(res => {
+      get(process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'userDefinedAlgorithms', jwtControl.getAuthConfig())
+      .then((res) => {
         disp(setData(res.data));
+      }, (error) => {
+        toast.error(`This should only occur in dev mode if your foxx app is not deployed, ` + error);
       });
       return {...state, selfDispatch: disp};
     }

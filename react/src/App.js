@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import jwtControl from "./JWTControl";
 
 // 3rd Party
 import {post} from "axios";
@@ -55,19 +56,6 @@ const AppBar = (props) => (
   />
 );
 
-function getCurrentJwt() {
-  return sessionStorage.getItem('jwt');
-}
-
-function getCurrentJwtUsername() {
-  return sessionStorage.getItem('jwtUser');
-}
-
-function setCurrentJwt(jwt, username) {
-  sessionStorage.setItem('jwt', jwt);
-  sessionStorage.setItem('jwtUser', username);
-}
-
 function App() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [userLoggedIn, setUserLoggedIn] = useState(false);
@@ -87,7 +75,6 @@ function App() {
         }
       })
       .then((response) => {
-        console.log(response);
         var jwtParts = response.data.jwt.split('.');
 
         if (!jwtParts[1]) {
@@ -100,15 +87,15 @@ function App() {
         //var payload = JSON.parse(atob(jwtParts[1]));
         //const activeUser = payload.preferred_username;
 
-        setCurrentJwt(response.data.jwt, username)
+        jwtControl.setCurrentJwt(response.data.jwt, username)
         setUserLoggedIn(true);
       }, (error) => {
         toast.error("Login failed: " + error);
-        setCurrentJwt(null, null);
+        jwtControl.setCurrentJwt(null, null);
       })
       .catch((err) => {
         toast.error("Login failed!");
-        setCurrentJwt(null, null);
+        jwtControl.setCurrentJwt(null, null);
       });
   }
 
@@ -190,7 +177,6 @@ function App() {
           <Form
             //value={userName}
             onChange={values => {
-              console.log(values);
               if (values.hasOwnProperty('username')) {
                 setUserName(values.username)
               }

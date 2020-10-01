@@ -1,5 +1,6 @@
 import React, {useState, createContext, useEffect} from 'react';
 import {get} from "axios";
+import {toast} from "react-toastify";
 
 export const SmartGraphListContext = createContext();
 
@@ -10,7 +11,9 @@ export const SmartGraphListProvider = props => {
 
   const fetchData = function () {
     get(process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'graphs')
-      .then(res => setGraphs(res.data))
+      .then((res) => setGraphs(res.data), (error) => {
+        toast.error(`This should only occur in dev mode if your foxx app is not deployed, ` + error);
+      });
   }
 
   useEffect(() => {

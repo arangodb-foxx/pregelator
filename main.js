@@ -1,6 +1,7 @@
 'use strict';
 
 // includes
+const internal = require('internal');
 const db = require('@arangodb').db;
 const pregel = require("@arangodb/pregel");
 let sgm = require("@arangodb/smart-graph");
@@ -12,53 +13,17 @@ const router = createRouter();
 module.context.use(router);
 
 router.use((req, res, next) => {
-  const auth = req.auth;
-  if (!auth || !auth.basic) {
-    res.setHeader("WWW-Authenticate", "Basic");
-    res.throw(401, "Authentication required");
+  if (internal.authenticationEnabled()) {
+    if (!req.authorized) {
+      res.throw('unauthorized');
+    }
   }
-  const { username, password } = auth.basic;
 
-  if (req.arangoUser) {
-    res.json({ username: req.arangoUser });
-  } else {
-    // res.throw("not found");
-    res.throw(403, "Bad username or password");
-  }
   next();
 });
 
 // example algo
 const vertexDegrees = require('./algos/exampleAlgorithm').vertexDegrees;
-
-/*router.post('/start', function (req, res) {
-  const name = req.body.name || "name";
-  const graphName = req.body.graphName;
-  const algorithm = req.body.algorithm;
-  let pid = "";
-
-  try {
-    pid = pregel.start(
-      "air",
-      graphName,
-      algorithm
-    );
-  } catch (e) {
-    res.throw('bad request', e.message, {cause: e});
-  }
-
-  res.send({
-    pid: pid
-  });
-})
-  .body(
-    joi.object().required(),
-    'This implies JSON.'
-  )
-  .response(['application/json'], 'A generic greeting.')
-  .summary('Generic greeting')
-  .description('Prints a generic greeting.');
- */
 
 router.post('/resultDetails', function (req, res) {
   const graphName = req.body.graphName || "";
@@ -103,20 +68,6 @@ router.post('/resultDetails', function (req, res) {
   .response(['application/json'], 'A generic greeting.')
   .summary('Generic greeting')
   .description('Prints a generic greeting.');
-
-/*router.post('/status', function (req, res) {
-  const pid = req.body.pid || "";
-  let result = pregel.status(pid);
-  res.send(result);
-})
-  .body(
-    joi.object().required(),
-    'This implies JSON.'
-  )
-  .response(['application/json'], 'A generic greeting.')
-  .summary('Generic greeting')
-  .description('Prints a generic greeting.');
-*/
 
 router.get('/graphs', function (req, res) {
   res.send(sgm._list());

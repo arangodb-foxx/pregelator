@@ -147,7 +147,7 @@ const JSONEditor = () => {
         return;
       }
 
-      console.log(process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL);
+      //console.log(process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL);
       const response = await post(
         process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL,
         //process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'start',
