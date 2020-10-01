@@ -14,7 +14,8 @@ function setCurrentJwt(jwt, username) {
 function getAuthConfig() {
   return {
     headers: {
-      Authorization: 'bearer ' + getCurrentJwt()
+      Authorization: 'bearer ' + getCurrentJwt(),
+      'Content-Type': 'application/json'
     }
   }
 }

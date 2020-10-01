@@ -11,6 +11,7 @@ import {useExecution} from "./ExecutionContext";
 import {post} from "axios";
 import {toast} from "react-toastify";
 import {Button} from "grommet/index";
+import jwtControl from "./JWTControl";
 
 const getRunning = (pregels) => {
   return Object.values(pregels).filter(p => p.state === 'running' || p.state === 'storing');
@@ -36,10 +37,7 @@ const RunningPregelList = () => {
       {
         pid: execution.pid
       },
-      {
-        headers:
-          {'Content-Type': 'application/json'}
-      }).then((responseStatus) => {
+      jwtControl.getAuthConfig()).then((responseStatus) => {
       if (responseStatus.data && responseStatus.data.state === 'done') {
         post(
           process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'resultDetails',
@@ -47,10 +45,7 @@ const RunningPregelList = () => {
             graphName: execution.selectedGraph,
             resultField: execution.resultField
           },
-          {
-            headers:
-              {'Content-Type': 'application/json'}
-          }).then((responseDetails) => {
+          jwtControl.getAuthConfig()).then((responseDetails) => {
           if (responseDetails.data) {
             let reports = [];
 

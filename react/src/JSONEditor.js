@@ -14,6 +14,7 @@ import {usePregel} from "./PregelContext";
 import {SmartGraphListContext} from "./SmartGraphListContext";
 import {useUserDefinedAlgorithms, storeAlgorithm, selectAlgorithm} from "./UserDefinedAlgorithmsContext";
 import {useExecution} from "./ExecutionContext";
+import jwtControl from "./JWTControl";
 
 const EditorActionsBar = (props) => (
   <Box
@@ -83,10 +84,7 @@ const JSONEditor = () => {
           if (pregel.state === 'running' || pregel.state === 'storing') {
             get(
               process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL + '/' + pregel.pid,
-              {
-                headers:
-                  {'Content-Type': 'application/json'}
-              }).then((response) => {
+              jwtControl.getAuthConfig()).then((response) => {
               if (response.data && response.data.state !== 'running' && response.data.state !== 'storing') {
                 setPregels(prevPregels => {
                   let updated = prevPregels;
@@ -156,10 +154,7 @@ const JSONEditor = () => {
           graphName: selectedGraph,
           params: algorithm
         },
-        {
-          headers:
-            {'Content-Type': 'application/json'}
-        });
+        jwtControl.getAuthConfig());
 
       const pregelPid = response.data;
 
@@ -227,30 +222,13 @@ const JSONEditor = () => {
     dispatchUDF(storeAlgorithm(selectedAlgorithm, editorRef.current.editor.getValue()));
   };
 
-  /*const getSelectedAlgorithm = () => {
-    if (selectedLocalAlgorithm) {
-      let algorithm = "";
-      try {
-        algorithm = userDefinedAlgorithms[selectedLocalAlgorithm].algorithm;
-      } catch (e) {
-        toast("Error: " + e);
-      }
-      return JSON.stringify(algorithm, null, 2)
-    }
-    // default
-    return JSON.stringify({}, null, 2)
-  }*/
-
   // TODO: export function - copy & paste of RunningPregelList
   const fetchExecutionResult = (execution) => {
     toast(`Fetching status now of pid: ${execution.pid}`);
 
     get(
       process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL + '/' + execution.pid,
-      {
-        headers:
-          {'Content-Type': 'application/json'}
-      }).then((responseStatus) => {
+      jwtControl.getAuthConfig()).then((responseStatus) => {
       // only refetch state in case of status is not "running"
       if (responseStatus.data && (responseStatus.data.state !== 'running')) {
         post(
@@ -259,10 +237,7 @@ const JSONEditor = () => {
             graphName: execution.selectedGraph,
             resultField: execution.resultField
           },
-          {
-            headers:
-              {'Content-Type': 'application/json'}
-          }).then((responseDetails) => {
+          jwtControl.getAuthConfig()).then((responseDetails) => {
           if (responseDetails.data) {
             let reports = [];
 
