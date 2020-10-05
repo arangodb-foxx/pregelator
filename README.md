@@ -56,6 +56,11 @@ To develop:
 yarn start
 ```
 
+To dest:
+```
+set -xg FOXX_CLI "foxx"; set -xg FOXX_SERVER "http://localhost:8529"; cd react; yarn build; cd .. ;make deploy; make zip; make install
+```
+
 ## Using the Makefile:
 
 1. Prepares local build directory structure:

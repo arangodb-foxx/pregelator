@@ -47,7 +47,7 @@ const reducer = (state, action) => {
     case "store":
       {
         const {name, data} = action.payload;
-        put(process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'userDefinedAlgorithms/' + name, data)
+        put(process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'userDefinedAlgorithms/' + name, data, jwtControl.getAuthConfig())
         .then(() => {
           state.selfDispatch(selectAlgorithm(name));
           toast(`Successfully stored: ${name}.`);

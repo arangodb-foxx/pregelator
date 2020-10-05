@@ -78,54 +78,51 @@ const SaveAs = ({editorRef}) => {
 
 const JSONEditor = () => {
   useInterval(() => {
-      // Update logic
-      let checkState = (pregels) => {
-        for (let [, pregel] of Object.entries(pregels)) {
-          if (pregel.state === 'running' || pregel.state === 'storing') {
-            get(
-              process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL + '/' + pregel.pid,
-              jwtControl.getAuthConfig()).then((response) => {
-              if (response.data && response.data.state !== 'running' && response.data.state !== 'storing') {
-                setPregels(prevPregels => {
-                  let updated = prevPregels;
-                  updated[pregel.pid].state = response.data.state;
-                  updated[pregel.pid].totalRuntime = response.data.totalRuntime.toFixed(5);
-                  return {...updated};
-                });
+    // Update logic
+    let checkState = (pregels) => {
+      for (let [, pregel] of Object.entries(pregels)) {
+        if (pregel.state === 'running' || pregel.state === 'storing') {
+          get(
+            process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL + '/' + pregel.pid,
+            jwtControl.getAuthConfig()).then((response) => {
+            if (response.data && response.data.state !== 'running' && response.data.state !== 'storing') {
+              setPregels(prevPregels => {
+                let updated = prevPregels;
+                updated[pregel.pid].state = response.data.state;
+                updated[pregel.pid].totalRuntime = response.data.totalRuntime.toFixed(5);
+                return {...updated};
+              });
 
-                // auto update if changed to done
-                fetchExecutionResult(pregel);
-              }
-            });
-          }
-        }
-
-        // check output editor changes
-        let outputCursorPosition = outputEditorRef.current.editor.getCursorPosition();
-        let previewCursorPosition = previewEditorRef.current.editor.getCursorPosition();
-        let outputVal = "";
-        if (execution.summary) {
-          outputVal = JSON.stringify(execution.summary, null, 2)
-        }
-        let previewVal = "";
-        if (execution.preview) {
-          previewVal = JSON.stringify(execution.preview, null, 2)
-        }
-
-        // only update if changed
-        if (outputEditorRef.current.editor.getValue() !== outputVal) {
-          outputEditorRef.current.editor.setValue(outputVal, outputCursorPosition);
-        }
-        if (previewEditorRef.current.editor.getValue() !== previewVal) {
-          previewEditorRef.current.editor.setValue(previewVal, previewCursorPosition)
+              // auto update if changed to done
+              fetchExecutionResult(pregel);
+            }
+          });
         }
       }
 
-      checkState(pregels);
-    },
-    1000
-  )
-  ;
+      // check output editor changes
+      let outputCursorPosition = outputEditorRef.current.editor.getCursorPosition();
+      let previewCursorPosition = previewEditorRef.current.editor.getCursorPosition();
+      let outputVal = "";
+      if (execution.summary) {
+        outputVal = JSON.stringify(execution.summary, null, 2)
+      }
+      let previewVal = "";
+      if (execution.preview) {
+        previewVal = JSON.stringify(execution.preview, null, 2)
+      }
+
+      // only update if changed
+      if (outputEditorRef.current.editor.getValue() !== outputVal) {
+        outputEditorRef.current.editor.setValue(outputVal, outputCursorPosition);
+      }
+      if (previewEditorRef.current.editor.getValue() !== previewVal) {
+        previewEditorRef.current.editor.setValue(previewVal, previewCursorPosition)
+      }
+    }
+
+    checkState(pregels);
+  }, 1000);
 
   let executeAlgorithm = async function () {
     try {
@@ -145,10 +142,8 @@ const JSONEditor = () => {
         return;
       }
 
-      //console.log(process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL);
       const response = await post(
         process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL,
-        //process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'start',
         {
           algorithm: "air",
           graphName: selectedGraph,
@@ -205,18 +200,12 @@ const JSONEditor = () => {
   const [pregels, setPregels] = usePregel();
   const [execution, setExecution] = useExecution();
 
-  const algorithm = userDefinedAlgorithms.hasOwnProperty(selectedAlgorithm)
-    ? JSON.stringify(userDefinedAlgorithms[selectedAlgorithm].algorithm, null, 2)
-    : "";
-
 // local state
   const [selectedGraph, setSelectedGraph] = useState(null);
-
 
   const setSelectedAlgorithm = (algo) => {
     dispatchUDF(selectAlgorithm(algo));
   }
-
 
   const replaceAlgorithm = () => {
     dispatchUDF(storeAlgorithm(selectedAlgorithm, editorRef.current.editor.getValue()));
@@ -276,7 +265,23 @@ const JSONEditor = () => {
           placeholder={'Select Algorithm'}
           //value={Object.keys(userDefinedAlgorithms)}
           onChange={({option}) => {
+            let cursorPosition = outputEditorRef.current.editor.getCursorPosition();
             setSelectedAlgorithm(option);
+            /*let getAlgorithm = function () {
+              return userDefinedAlgorithms.hasOwnProperty(selectedAlgorithm)
+                ? JSON.stringify(userDefinedAlgorithms[selectedAlgorithm].algorithm, null, 2)
+                : "";
+            }*/
+            // const algo = getAlgorithm();
+            get(process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'userDefinedAlgorithms/' + option, jwtControl.getAuthConfig())
+              .then((res) => {
+                console.log(res.data);
+                if (res.data && res.data.algorithm) {
+                  editorRef.current.editor.setValue(JSON.stringify(res.data.algorithm, null, 2), cursorPosition);
+                }
+              }, (error) => {
+                toast.error(`This should only occur in dev mode if your foxx app is not deployed, ` + error);
+              });
           }}
           value={selectedAlgorithm}
         />
@@ -304,7 +309,7 @@ const JSONEditor = () => {
           onClick={replaceAlgorithm}
         />
 
-        <SaveAs editorRef={editorRef}></SaveAs>
+        <SaveAs editorRef={editorRef}/>
 
       </EditorActionsBar>
 
@@ -326,7 +331,6 @@ const JSONEditor = () => {
                      name="aceInputEditor"
                      setOptions={{useWorker: false}}
                      editorProps={{$blockScrolling: true}}
-                     value={algorithm}
                      placeholder="Please select an algorithm"
           />
         </Box>
@@ -344,7 +348,6 @@ const JSONEditor = () => {
                          width={'full'}
                          height={'100%'}
                          theme="monokai"
-                //onChange={{}}
                          name="aceSummaryEditor"
                          setOptions={{useWorker: false}}
                          editorProps={{$blockScrolling: true}}

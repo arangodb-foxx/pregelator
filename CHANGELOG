@@ -1,6 +1,7 @@
 Build_v0_0_8
 -----
 
+* Do not rerender input editor in case of an executed algorithm.
 * Added login mask authentication page.
 * Use native Pregel API (Start/Stop). Needed to work with load balancer used in Oasis.
 * UI optimizations.

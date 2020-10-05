@@ -95,17 +95,37 @@ router.get('/userDefinedAlgorithms', function (req, res) {
   .summary('Get all stored algorithms')
   .description('Get all stored pregel algorithms. As a Map name => implementation.');
 
+router.get('/userDefinedAlgorithms/:name', function (req, res) {
+  const qualifiedName = module.context.collectionName("userDefinedAlgorithms");
+  const name = req.param("name");
+  let document = {};
+  try {
+    document = db[qualifiedName].document(qualifiedName + '/' + name);
+  } catch (e) {
+    // if not found in collection, check local algos
+    if (name === 'dev_DemoVertexDegrees') {
+      document = {
+        algorithm: vertexDegrees
+      };
+    }
+  }
 
-  router.put('/userDefinedAlgorithms/:name', function (req, res) {
-    const qualifiedName = module.context.collectionName("userDefinedAlgorithms");
-    const query = `INSERT {_key: @name, algorithm: @algorithm} INTO ${qualifiedName} OPTIONS { overwrite: true }`;
-    const name = req.param("name");
-    const algorithm = req.body;
-    db._query(query, {name, algorithm});
-    res.send(true);
-  })
-    .pathParam('name', joi.string().required())
-    .body(joi.object().required(), "Alogrithm data")
-    .response(['application/json'], 'Success Message')
-    .summary('Save the given algorithm.')
-    .description('Save the given algorithm');
+  res.send(document);
+})
+  .response(['application/json'], 'Returns single algorithm. name => implementation')
+  .summary('Get all stored algorithms')
+  .description('Get all stored pregel algorithms. As a Map name => implementation.');
+
+router.put('/userDefinedAlgorithms/:name', function (req, res) {
+  const qualifiedName = module.context.collectionName("userDefinedAlgorithms");
+  const query = `INSERT {_key: @name, algorithm: @algorithm} INTO ${qualifiedName} OPTIONS { overwrite: true }`;
+  const name = req.param("name");
+  const algorithm = req.body;
+  db._query(query, {name, algorithm});
+  res.send(true);
+})
+  .pathParam('name', joi.string().required())
+  .body(joi.object().required(), "Alogrithm data")
+  .response(['application/json'], 'Success Message')
+  .summary('Save the given algorithm.')
+  .description('Save the given algorithm');
