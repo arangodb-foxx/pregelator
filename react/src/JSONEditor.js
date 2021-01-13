@@ -145,7 +145,7 @@ const JSONEditor = () => {
       const response = await post(
         process.env.REACT_APP_ARANGODB_COORDINATOR_BASE + process.env.REACT_APP_ARANGODB_CONTROL_PREGEL,
         {
-          algorithm: "air",
+          algorithm: "ppa",
           graphName: selectedGraph,
           params: algorithm
         },
